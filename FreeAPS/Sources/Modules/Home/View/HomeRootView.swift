@@ -581,7 +581,7 @@ extension Home {
                     Button { state.showModal(for: .addCarbs) }
                     label: {
                         ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                            Image("carbs")
+                            Image("carbs1")
                                 .renderingMode(.template)
                                 .resizable()
                                 .frame(width: 24, height: 24)
@@ -628,7 +628,7 @@ extension Home {
                     }
                     Button { state.showModal(for: .settings) }
                     label: {
-                        Image("settings1")
+                        Image("settings")
                             .renderingMode(.template)
                             .resizable()
                             .frame(width: 24, height: 24)
