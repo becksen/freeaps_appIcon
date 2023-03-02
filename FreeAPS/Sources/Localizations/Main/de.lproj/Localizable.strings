@@ -1008,6 +1008,7 @@ Enact a temp Basal or a temp target */
 /* */
 "Apple Health" = "Apple Health";
 
+
 /* */
 "Connect to Apple Health" = "Apple Health verbinden";
 
@@ -1609,3 +1610,6 @@ Enact a temp Basal or a temp target */
 
 /* Headline "Adjustment Factor" */
 "Adjustment Factor" = "Korrekturfaktor";
+
+/* AppIcon Change View */
+"AppIcon Change" = "AppIcon Wechseln";
