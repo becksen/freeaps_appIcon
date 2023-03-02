@@ -25,14 +25,40 @@ extension DataTable {
             DispatchQueue.global().async {
                 let units = self.settingsManager.settings.units
 
-                let carbs = self.provider.carbs().map {
-                    Treatment(units: units, type: .carbs, date: $0.createdAt, amount: $0.carbs)
-                }
+                let carbs = self.provider.carbs()
+                    .filter { !($0.isFPU ?? false) }
+                    .map {
+                        if let id = $0.id {
+                            return Treatment(
+                                units: units,
+                                type: .carbs,
+                                date: $0.createdAt,
+                                amount: $0.carbs,
+                                id: id
+                            )
+                        } else {
+                            return Treatment(units: units, type: .carbs, date: $0.createdAt, amount: $0.carbs)
+                        }
+                    }
+
+                let fpus = self.provider.fpus()
+                    .filter { $0.isFPU ?? false }
+                    .map {
+                        Treatment(
+                            units: units,
+                            type: .fpus,
+                            date: $0.createdAt,
+                            amount: $0.carbs,
+                            id: $0.id,
+                            isFPU: $0.isFPU,
+                            fpuID: $0.fpuID
+                        )
+                    }
 
                 let boluses = self.provider.pumpHistory()
                     .filter { $0.type == .bolus }
                     .map {
-                        Treatment(units: units, type: .bolus, date: $0.timestamp, amount: $0.amount)
+                        Treatment(units: units, type: .bolus, date: $0.timestamp, amount: $0.amount, idPumpEvent: $0.id)
                     }
 
                 let tempBasals = self.provider.pumpHistory()
@@ -77,7 +103,7 @@ extension DataTable {
                     }
 
                 DispatchQueue.main.async {
-                    self.treatments = [carbs, boluses, tempBasals, tempTargets, suspend, resume]
+                    self.treatments = [carbs, boluses, tempBasals, tempTargets, suspend, resume, fpus]
                         .flatMap { $0 }
                         .sorted { $0.date > $1.date }
                 }
@@ -90,15 +116,15 @@ extension DataTable {
             }
         }
 
-        func deleteCarbs(at date: Date) {
-            provider.deleteCarbs(at: date)
+        func deleteCarbs(_ treatment: Treatment) {
+            provider.deleteCarbs(treatment)
         }
 
-        func deleteInsulin(at date: Date) {
+        func deleteInsulin(_ treatment: Treatment) {
             unlockmanager.unlock()
                 .sink { _ in } receiveValue: { [weak self] _ in
                     guard let self = self else { return }
-                    self.provider.deleteInsulin(at: date)
+                    self.provider.deleteInsulin(treatment)
                 }
                 .store(in: &lifetime)
         }

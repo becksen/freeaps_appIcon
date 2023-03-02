@@ -94,7 +94,29 @@ extension DataTable {
                                 message: Text(item.amountText),
                                 primaryButton: .destructive(
                                     Text("Delete"),
-                                    action: { state.deleteCarbs(at: item.date) }
+                                    action: { state.deleteCarbs(item) }
+                                ),
+                                secondaryButton: .cancel()
+                            )
+                            isRemoveCarbsAlertPresented = true
+                        }
+                        .alert(isPresented: $isRemoveCarbsAlertPresented) {
+                            removeCarbsAlert!
+                        }
+                }
+
+                if item.type == .fpus {
+                    Spacer()
+                    Image(systemName: "xmark.circle").foregroundColor(.secondary)
+                        .contentShape(Rectangle())
+                        .padding(.vertical)
+                        .onTapGesture {
+                            removeCarbsAlert = Alert(
+                                title: Text("Delete carb equivalents?"),
+                                message: Text(""), // Temporary fix. New to fix real amount of carb equivalents later
+                                primaryButton: .destructive(
+                                    Text("Delete"),
+                                    action: { state.deleteCarbs(item) }
                                 ),
                                 secondaryButton: .cancel()
                             )
@@ -116,7 +138,7 @@ extension DataTable {
                                 message: Text(item.amountText),
                                 primaryButton: .destructive(
                                     Text("Delete"),
-                                    action: { state.deleteInsulin(at: item.date) }
+                                    action: { state.deleteInsulin(item) }
                                 ),
                                 secondaryButton: .cancel()
                             )
