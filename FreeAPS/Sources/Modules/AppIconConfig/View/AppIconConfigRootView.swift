@@ -1,31 +1,46 @@
 import SwiftUI
 import Swinject
 
+class NamesOfIcon: ObservableObject {
+    var namesOfIcon: [String?] = [nil]
+
+    @Published var iconCount = 0
+
+    init() {
+        getAlternateIcons()
+
+        if let currentIcon = UIApplication.shared.alternateIconName {
+            // if let currentIcon = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any] {
+            iconCount = namesOfIcon.firstIndex(of: currentIcon) ?? 0
+        }
+    }
+
+    func getAlternateIcons()
+    {
+        // looking into our info.plist file to locate the specific Bundle with our icons
+        if let icons = Bundle.main.object(forInfoDictionaryKey: "CFBundleIcons") as? [String: Any],
+           let alternateIcons = icons["CFBundleAlternateIcons"] as? [String: Any]
+        {
+            for (_, value) in alternateIcons {
+                // Accessing the name of icon list inside the dictionary
+                guard let iconList = value as? [String: Any] else { return }
+                // Accessing the name of icon files
+                // guard let iconFiles = iconList["CFBundleIconFiles"] as? [String]
+                /* guard let iconFiles = iconList["CFBundleIconName"] as? [String]
+                 else { return } */
+                // Accessing the name of the icon
+                // guard let icon = iconFiles.first else { return }
+                namesOfIcon.append(iconList.values.first as! String)
+            }
+        }
+    }
+}
+
 extension AppIconConfig {
+    // struct RootView: AppIconView.environmentObject(NamesOfIcon())
     /*     struct RootView: BaseView {
      let resolver: Resolver
      @StateObject var state = StateModel()
-
-     private var isfFormatter: NumberFormatter {
-     let formatter = NumberFormatter()
-     formatter.numberStyle = .decimal
-     formatter.maximumFractionDigits = 2
-     return formatter
-     }
-
-     private var rateFormatter: NumberFormatter {
-     let formatter = NumberFormatter()
-     formatter.numberStyle = .decimal
-     formatter.maximumFractionDigits = 2
-     return formatter
-     }
-
-     private var dateFormatter: DateFormatter {
-     let formatter = DateFormatter()
-     formatter.dateStyle = .medium
-     formatter.timeStyle = .short
-     return formatter
-     }
 
      func GetAppIcon(isPrimary: Bool) -> UIImage {
      var appIcon: UIImage! {
@@ -92,9 +107,17 @@ extension AppIconConfig {
       .navigationBarTitleDisplayMode(.automatic)*/
      }
      } */
+    func addItem() {
+        // print("test")
+
+        let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any]
+        let alternateIconsDictionary = iconsDictionary!["CFBundleAlternateIcons"] as? [String: Any]
+        let altIconName = alternateIconsDictionary!["AppIconAlternate1"] as? [String: Any]
+    }
 
     struct ContentView: View {
         @AppStorage("active_icon") var activeAppIcon: String = "AppIcon"
+
         var body: some View {
             NavigationStack {
                 Picker(selection: $activeAppIcon) {
@@ -114,13 +137,121 @@ extension AppIconConfig {
                 } else {
                     UIApplication.shared.setAlternateIconName(newValue)
                 }
-
-                // activeAppIcon = newValue
             }
         }
-
-        /* .onAppear(perform: configureView)
-         .navigationTitle("AppIcon Change")
-         .navigationBarTitleDisplayMode(.automatic)*/
     }
+
+    struct AppIconView2: View {
+        // @AppStorage("active_icon") var activeAppIcon: String = "AppIcon"
+        var body: some View {
+            /* Image("1024 2")
+             .resizable()
+             .scaledToFit()
+             .cornerRadius(10)
+             .padding() */
+            Button(action: {
+                let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any]
+                print(iconsDictionary?.first?.value as Any)
+
+            })
+                {
+                    Label { Text("Default Icon").font(.callout.bold()) }
+                    icon: { Image(uiImage: UIImage(named: "AppIcon_RED") ?? UIImage())
+                        .resizable()
+                        .scaledToFit()
+                        .padding()
+                        .cornerRadius(10)
+                        .frame(width: 80, height: 80)
+                    }
+                }
+        }
+    }
+
+    struct AppIconView3: View {
+        @StateObject var iconSettings = NamesOfIcon()
+        var body: some View {
+            Section {
+                ForEach(0 ..< $iconSettings.namesOfIcon.count) { i in
+                    Button(action: {
+                        if self.iconSettings.namesOfIcon[i] == "AppIcon" {
+                            UIApplication.shared.setAlternateIconName(nil)
+                        } else {
+                            UIApplication.shared.setAlternateIconName(self.iconSettings.namesOfIcon[i])
+                        }
+
+                    })
+                        {
+                            Label { Text(self.iconSettings.namesOfIcon[i] ?? "AppIcon") }
+                            icon: { Image(uiImage: UIImage(named: self.iconSettings.namesOfIcon[i] ?? "AppIcon") ?? UIImage())
+                                .resizable()
+                                .scaledToFit()
+                                .border(.red)
+
+                                // .frame(width: 80, height: 80, alignment: .topLeading)
+                            }
+                        }
+                }.frame(width: 200, height: 25, alignment: .topLeading)
+                    .border(.green)
+            }
+            .navigationTitle("Change App Icon")
+            .foregroundColor(.black)
+            .frame(alignment: .topLeading)
+            // .padding(.top, -50)
+            .border(.yellow)
+
+            // .scaledToFit()
+
+            // .frame(alignment: .leading)
+        }
+    }
+
+    // --------------------------------Final View--------------------------------------------------------
+    struct AppIconView: View {
+        @StateObject var iconSettings = NamesOfIcon()
+        var body: some View {
+            VStack {
+                Text("Hallo")
+                    .padding(.top)
+                    .scaledToFit()
+
+                ForEach(0 ..< $iconSettings.namesOfIcon.count) { i in
+                    Button(action: {
+                        if self.iconSettings.namesOfIcon[i] == "AppIcon" {
+                            UIApplication.shared.setAlternateIconName(nil)
+                        } else {
+                            UIApplication.shared.setAlternateIconName(self.iconSettings.namesOfIcon[i])
+                        }
+
+                    })
+                        {
+                            Label { Text(self.iconSettings.namesOfIcon[i] ?? "AppIcon") }
+                            icon: { Image(uiImage: UIImage(named: self.iconSettings.namesOfIcon[i] ?? "AppIcon") ?? UIImage())
+                                .resizable()
+                                .scaledToFit()
+                                .border(.red)
+
+                                // .frame(width: 80, height: 80, alignment: .topLeading)
+                            }
+                        }
+                }.frame(width: 200, height: 25, alignment: .topLeading)
+                    .border(.green)
+            }
+            .alignmentGuide(HorizontalAlignment.leading) { _ in 80 }
+            .scaledToFit()
+            .navigationTitle("Change App Icon")
+            .foregroundColor(.black)
+            .frame(alignment: .topLeading)
+            // .padding(.top, -200)
+            .border(.yellow)
+
+            // .scaledToFit()
+
+            // .frame(alignment: .leading)
+        }
+    }
+
+    // --------------------------------Final View--------------------------------------------------------
 }
+
+// get currently used icon:
+// UIApplication.shared.alternateIconName
