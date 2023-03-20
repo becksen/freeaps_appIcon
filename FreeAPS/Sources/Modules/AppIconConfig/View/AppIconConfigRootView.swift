@@ -107,13 +107,13 @@ extension AppIconConfig {
       .navigationBarTitleDisplayMode(.automatic)*/
      }
      } */
-    func addItem() {
-        // print("test")
+    /* func addItem() {
+     // print("test")
 
-        let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any]
-        let alternateIconsDictionary = iconsDictionary!["CFBundleAlternateIcons"] as? [String: Any]
-        let altIconName = alternateIconsDictionary!["AppIconAlternate1"] as? [String: Any]
-    }
+     let iconsDictionary = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any]
+     let alternateIconsDictionary = iconsDictionary!["CFBundleAlternateIcons"] as? [String: Any]
+     let altIconName = alternateIconsDictionary!["AppIconAlternate1"] as? [String: Any]
+     }*/
 
     struct ContentView: View {
         @AppStorage("active_icon") var activeAppIcon: String = "AppIcon"
@@ -206,44 +206,53 @@ extension AppIconConfig {
     }
 
     // --------------------------------Final View--------------------------------------------------------
-    struct AppIconView: View {
+    struct RootView: BaseView {
+        let resolver: Resolver
+        @StateObject var state = StateModel()
         @StateObject var iconSettings = NamesOfIcon()
         var body: some View {
-            VStack {
-                Text("Hallo")
-                    .padding(.top)
-                    .scaledToFit()
-
-                ForEach(0 ..< $iconSettings.namesOfIcon.count) { i in
-                    Button(action: {
-                        if self.iconSettings.namesOfIcon[i] == "AppIcon" {
-                            UIApplication.shared.setAlternateIconName(nil)
-                        } else {
-                            UIApplication.shared.setAlternateIconName(self.iconSettings.namesOfIcon[i])
-                        }
-
-                    })
-                        {
-                            Label { Text(self.iconSettings.namesOfIcon[i] ?? "AppIcon") }
-                            icon: { Image(uiImage: UIImage(named: self.iconSettings.namesOfIcon[i] ?? "AppIcon") ?? UIImage())
-                                .resizable()
-                                .scaledToFit()
-                                .border(.red)
-
-                                // .frame(width: 80, height: 80, alignment: .topLeading)
+            Form {
+                Section(
+                    header: Text(
+                        "This feature allows to change the AppIcon on FAX that you see on the Home Screen\n\nIt dynamically fetches all AppIcons that are available in FreeAPS->Resources->Assets.xcassets\nYou can add your own icon easilly with right-click. Select iOS->New iOS App Icon. Add one .png image with size 1024x1024. Done"
+                    ).font(.body)
+                )
+                    {}
+                VStack {
+                    ForEach(0 ..< $iconSettings.namesOfIcon.count) { i in
+                        Button(action: {
+                            if self.iconSettings.namesOfIcon[i] == "AppIcon" {
+                                UIApplication.shared.setAlternateIconName(nil)
+                            } else {
+                                UIApplication.shared.setAlternateIconName(self.iconSettings.namesOfIcon[i])
                             }
-                        }
-                }.frame(width: 200, height: 25, alignment: .topLeading)
-                    .border(.green)
-            }
-            .alignmentGuide(HorizontalAlignment.leading) { _ in 80 }
-            .scaledToFit()
-            .navigationTitle("Change App Icon")
-            .foregroundColor(.black)
-            .frame(alignment: .topLeading)
-            // .padding(.top, -200)
-            .border(.yellow)
 
+                        })
+                            {
+                                Label { Text(self.iconSettings.namesOfIcon[i] ?? "AppIcon") }
+                                icon: { Image(uiImage: UIImage(named: self.iconSettings.namesOfIcon[i] ?? "AppIcon") ?? UIImage())
+                                    .resizable()
+                                    .scaledToFit()
+                                    .border(.red)
+
+                                    // .frame(width: 80, height: 80, alignment: .topLeading)
+                                }
+                            }
+                    }.frame(width: 200, height: 25, alignment: .topLeading)
+                        .border(.green)
+                }
+            }
+            // }
+            .onAppear(perform: configureView)
+            // .alignmentGuide(HorizontalAlignment.leading) { _ in 80 }
+            // .scaledToFit()
+            .navigationTitle("Change App Icon")
+            .navigationBarTitleDisplayMode(.automatic)
+            // .foregroundColor(.black)
+            // .frame(alignment: .topLeading)
+            // .padding(.top, -200)
+            // .border(.yellow)
+            // .navigationViewStyle(.stack)
             // .scaledToFit()
 
             // .frame(alignment: .leading)
@@ -253,5 +262,4 @@ extension AppIconConfig {
     // --------------------------------Final View--------------------------------------------------------
 }
 
-// get currently used icon:
-// UIApplication.shared.alternateIconName
+// }
