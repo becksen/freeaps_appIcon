@@ -185,19 +185,19 @@ extension AppIconConfig {
                             icon: { Image(uiImage: UIImage(named: self.iconSettings.namesOfIcon[i] ?? "AppIcon") ?? UIImage())
                                 .resizable()
                                 .scaledToFit()
-                                .border(.red)
+                                // .border(.red)
 
                                 // .frame(width: 80, height: 80, alignment: .topLeading)
                             }
                         }
-                }.frame(width: 200, height: 25, alignment: .topLeading)
-                    .border(.green)
+                }.frame(width: 200, height: 45, alignment: .topLeading)
+                // .border(.green)
             }
             .navigationTitle("Change App Icon")
             .foregroundColor(.black)
             .frame(alignment: .topLeading)
             // .padding(.top, -50)
-            .border(.yellow)
+            // .border(.yellow)
 
             // .scaledToFit()
 
@@ -238,7 +238,7 @@ extension AppIconConfig {
                                     // .frame(width: 80, height: 80, alignment: .topLeading)
                                 }
                             }
-                    }.frame(width: 200, height: 25, alignment: .topLeading)
+                    }.frame(width: 200, height: 40, alignment: .topLeading)
                         .border(.green)
                 }
             }
