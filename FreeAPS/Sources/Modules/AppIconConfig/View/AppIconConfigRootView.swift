@@ -167,7 +167,9 @@ extension AppIconConfig {
         }
     }
 
+    // TODO: change font color when changing iOS to dark mode
     struct AppIconView3: View {
+        @Environment(\.colorScheme) var colorScheme
         @StateObject var iconSettings = NamesOfIcon()
         var body: some View {
             Section {
@@ -194,7 +196,8 @@ extension AppIconConfig {
                 // .border(.green)
             }
             .navigationTitle("Change App Icon")
-            .foregroundColor(.black)
+            .foregroundColor(colorScheme == .dark ? .white : .black)
+
             .frame(alignment: .topLeading)
             // .padding(.top, -50)
             // .border(.yellow)
